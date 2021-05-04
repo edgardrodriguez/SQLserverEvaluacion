@@ -1,0 +1,187 @@
+CREATE DATABASE dbHospital;
+USE dbHospital;
+
+--CREATE SCHEMA Paciente
+--GO
+--CREATE SCHEMA Medico
+--GO
+--CREATE SCHEMA Historia
+--GO
+
+--creacion de tablas 
+CREATE TABLE Paciente.Paciente
+(
+CODPAC int NOT NULL IDENTITY(1,1),
+NOMPAC varchar(120) NOT NULL,
+APEPATPAC varchar(120) NOT NULL,
+APEMATPAC varchar(120) NOT NULL,
+FECNACPAC date NOT NULL,
+SEXPAC char(1) NOT NULL,
+DNIPAC char(8) NOT NULL,
+TELEFPAC varchar (9) null,
+EMAILPAC  varchar(100) null,
+DOMPAC  varchar(120) not null,
+UBIGEOPAC char(6)  not null,
+FECREGPAC datetime  null,
+OBSERVPAC varchar(250)null,
+CONSTRAINT Paciente_pk PRIMARY KEY  (CODPAC)
+)
+GO
+CREATE TABLE Historia.HISTORIA
+(
+CODHIST int not null IDENTITY(1,1),
+FECHIST datetime not null,
+OBSHIST varchar(1800) not null,
+CONSTRAINT HISTORIA_pk PRIMARY KEY  (CODHIST)
+)
+GO
+CREATE TABLE Paciente.HISTORIA_PACIENTE
+(
+CODHIST int NOT NULL,
+CODPAC int NOT NULL,
+CODMED int NOT NULL,
+)
+GO
+CREATE TABLE Historia.TURNO
+(
+CODTUR int not null IDENTITY(1,1),
+FECTUR datetime,
+ESTTUR smallint,
+OBSTUR varchar (500),
+CONSTRAINT TURNO_pk PRIMARY KEY  (CODTUR)
+)
+GO
+CREATE TABLE Paciente.TURNO_PACIENTE
+(
+CODTUR INT NOT NULL,
+CODPAC INT,
+CODMED INT,
+)
+GO
+
+CREATE TABLE Paciente.UBIGEO
+(
+CODUB char(6)NOT NULL,
+DISTUB varchar (60),
+PROVUB varchar (60),
+DEPUB varchar (60),
+CONSTRAINT UBIGEO_pk PRIMARY KEY  (CODUB)
+)
+GO
+
+CREATE TABLE Medico.ESPECIALIDAD
+(
+CODESP int not null IDENTITY(1,1),
+NOMESP varchar (80) NOT NULL,
+OBSESP varchar (100) NULL,
+CONSTRAINT ESPECIALIDAD_pk PRIMARY KEY  (CODESP)
+)
+GO
+
+CREATE TABLE Medico.Medico
+(
+CODMED int not null IDENTITY(1,1),
+NOMMED VARCHAR (120) NOT NULL,
+APEPATMED VARCHAR (120) NOT NULL,
+APEMATMED VARCHAR (120) NOT NULL,
+FECNACMED DATE NOT NULL,
+SEXMED CHAR (1) NOT NULL,
+DNIMED CHAR (8) NOT NULL,
+TELEFMED VARCHAR(9) NULL,
+EMAILMED VARCHAR (120) NULL,
+DOMMED VARCHAR (120) NOT NULL,
+UBIGEOMED char (6) NOT NULL,
+FECREGMED datetime NULL,
+OBSERVMED varchar (120) NULL,
+CONSTRAINT Medico_pk PRIMARY KEY  (CODMED)
+)
+GO
+CREATE TABLE Medico.MEDICO_ESPECIALIDAD
+(
+CODMED int NOT NULL,
+CODESP int NOT NULL,
+DESCESP varchar(1000),
+)
+GO
+-- creacion de relaciones entre las tablas
+-- Reference: PACIENTE_UBIGEO
+ALTER TABLE Paciente.Paciente ADD CONSTRAINT PACIENTE_UBIGEO
+    FOREIGN KEY (UBIGEOPAC)
+    REFERENCES Paciente.UBIGEO (CODUB);
+
+-- Reference: MEDICO_ESPECIALIDAD_MEDICO
+ALTER TABLE Medico.MEDICO_ESPECIALIDAD ADD CONSTRAINT MEDICO_ESPECIALIDAD_MEDICO
+	FOREIGN KEY (CODMED)
+	REFERENCES Medico.Medico(CODMED);
+
+-- Reference: MEDICO_ESPECIALIDAD_ESPECIALIDAD
+ALTER TABLE Medico.MEDICO_ESPECIALIDAD ADD CONSTRAINT MEDICO_ESPECIALIDAD_ESPECIALIDAD
+	FOREIGN KEY (CODESP)
+	REFERENCES Medico.ESPECIALIDAD(CODESP);
+
+-- Reference: TURNO_PACIENTE_TURNO
+ALTER TABLE Paciente.TURNO_PACIENTE ADD CONSTRAINT TURNO_PACIENTE_TURNO
+	FOREIGN KEY (CODTUR)
+	REFERENCES Historia.TURNO(CODTUR);
+
+-- Reference: TURNO_PACIENTE_PACIENTE
+ALTER TABLE Paciente.TURNO_PACIENTE ADD CONSTRAINT TURNO_PACIENTE_PACIENTE
+	FOREIGN KEY (CODPAC)
+	REFERENCES  Paciente.Paciente(CODPAC);
+
+-- Reference: TURNO_PACIENTE_MEDICO
+ALTER TABLE Paciente.TURNO_PACIENTE ADD CONSTRAINT TURNO_PACIENTE_MEDICO
+	FOREIGN KEY (CODMED)
+	REFERENCES Medico.Medico(CODMED);
+
+-- Reference: HISTORIA_PACIENTE_PACIENTE
+ALTER TABLE Paciente.HISTORIA_PACIENTE ADD CONSTRAINT HISTORIA_PACIENTE_HISTORIA
+	FOREIGN KEY (CODPAC)
+	REFERENCES Paciente.Paciente(CODPAC);
+
+-- Reference: HISTORIA_PACIENTE_MEDICO
+ALTER TABLE Paciente.HISTORIA_PACIENTE ADD CONSTRAINT HISTORIA_PACIENTE_MEDICO
+	FOREIGN KEY (CODMED)
+	REFERENCES Medico.Medico(CODMED);
+
+-- Reference: HISTORIA_PACIENTE_HISTORIA
+ALTER TABLE Paciente.HISTORIA_PACIENTE ADD CONSTRAINT HISTORIA_PACIENTE_PACIENTE
+	FOREIGN KEY (CODHIST)
+	REFERENCES  Historia.HISTORIA(CODHIST);
+
+-- Reference: MEDICO_UBIGEO
+ALTER TABLE Medico.Medico ADD CONSTRAINT MEDICO_UBIGEO_MEDICO
+	FOREIGN KEY (UBIGEOMED)
+	REFERENCES  Paciente.UBIGEO(CODUB);
+
+-- insertar datos
+-- error de datos
+-- insert into Paciente.Paciente ( NOMPAC, APEPATPAC, APEMATPAC,FECNACPAC, SEXPAC, DNIPAC, TELEFPAC, EMAILPAC, DOMPAC,UBIGEOPAC, OBSERVPAC) VALUES ('Fernando','Campos','Guerra','2008-11-11','M','9897822','998877665','fernando@gmail.com','Av. Los Manglares','150101','El paciente vino con un acompañante');
+insert into Historia.HISTORIA (FECHIST,OBSHIST) values('2000-03-01 00:00:00.000','El paciente se antendio sin problemas');
+insert into Historia.HISTORIA (FECHIST,OBSHIST) values('2002-04-05 00:00:00.000','Tiene que llevar controles semanales');
+insert into Historia.HISTORIA (FECHIST,OBSHIST) values('2007-10-04 00:00:00.000','Debe tomar los medicamentos indicados en la consulta');
+insert into Historia.HISTORIA (FECHIST,OBSHIST) values('2010-12-10 00:00:00.000','El paciente debe ser transferido ');
+
+insert into Historia.TURNO (FECTUR,ESTTUR,OBSTUR) values('1979-10-04 10:30:20.000','1','Primer turno del dia');
+insert into Historia.TURNO (FECTUR,ESTTUR,OBSTUR) values('1979-10-04 11:00:20.000','1','Segundo turno del dia');
+insert into Historia.TURNO (FECTUR,ESTTUR,OBSTUR) values('1979-10-04 11:30:20.000','1','Tercer turno del dia');
+insert into Historia.TURNO (FECTUR,ESTTUR,OBSTUR) values('1979-10-04 13:00:20.000','1','Cuarto turno del dia');
+insert into Historia.TURNO (FECTUR,ESTTUR,OBSTUR) values('1979-10-04 13:30:20.000','1','Quinto turno del dia');
+
+insert into Medico.Medico (NOMMED,APEPATMED,APEMATMED,FECNACMED,SEXMED,DNIMED,TELEFMED,EMAILMED,DOMMED,UBIGEOMED,FECREGMED,OBSERVMED) values('Jorge','Ramires','Huaman','1979-07-07','F','72717476','912618335','civerclocmen@dfs.com','Jr piura','150101','1979-10-04 13:30:20.000','OBSERVCION');
+
+insert into Medico.ESPECIALIDAD(NOMESP,OBSESP) values ('Medicina General','Es para la atencion de enfemedades en general');
+insert into Medico.ESPECIALIDAD(NOMESP,OBSESP) values ('Odontologia','Atencion dental');
+insert into Medico.ESPECIALIDAD(NOMESP,OBSESP) values ('Pediatria','Atencion para niños');
+insert into Medico.ESPECIALIDAD(NOMESP,OBSESP) values ('Oftanmologia','Atencion a la vista');
+insert into Medico.ESPECIALIDAD(NOMESP,OBSESP) values ('Nutricion','Relacionado con temas de alimentacion');
+
+insert into Medico.MEDICO_ESPECIALIDAD(CODMED,CODESP,DESCESP) values('1','2','Atiende todos los dias, los dias L-M-V');
+insert into Medico.MEDICO_ESPECIALIDAD(CODMED,CODESP,DESCESP) values('2','4','Atiende todos los dias, los dias M-J');
+insert into Medico.MEDICO_ESPECIALIDAD(CODMED,CODESP,DESCESP) values('2','3','Atiende todo el dia, solo los jueves');
+insert into Medico.MEDICO_ESPECIALIDAD(CODMED,CODESP,DESCESP) values('3','4','Atencion los dias sabados de 8am a 1pm');
+insert into Medico.MEDICO_ESPECIALIDAD(CODMED,CODESP,DESCESP) values('3','3','Atencion Martes y jueves por la semana');
+
+BACKUP DATABASE dbVentas
+to DISK= 'D:\DataDB\Ventas2019.bak'
+go
